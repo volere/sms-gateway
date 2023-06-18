@@ -1,5 +1,3 @@
-import { NextApiRequest } from "next";
-
 import * as twilio from "twilio";
 export function prepareParams(body: {
   [key: string]: [];
@@ -21,9 +19,7 @@ export function checkSignature(
 ) {
   try {
     const sortedParams = Object.fromEntries(Object.entries(params).sort());
-    if (process.env.VERCEL_ENV == "development") {
-      return true;
-    }
+
     const isValidSignature = twilio.validateRequest(
       authToken,
       twilioSignature,
@@ -31,7 +27,14 @@ export function checkSignature(
       sortedParams
     );
 
+    // if testing env return true by default, but log signature check
+    if (process.env.VERCEL_ENV == "development") {
+      console.log("testing url:", url);
+      console.log("sigcheck, should be true: ", isValidSignature);
+      return true;
+    }
     if (!isValidSignature) {
+      //Return error if signature is invalid
       console.error(
         "Invalid Signature: ",
         isValidSignature,
@@ -41,7 +44,6 @@ export function checkSignature(
         params
       );
     }
-    console.log("SIGNATURE CHECKED");
     return isValidSignature;
   } catch (error) {
     console.error("Error while checking signature: ", error);
