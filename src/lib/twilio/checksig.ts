@@ -1,12 +1,14 @@
 import { NextApiRequest } from "next";
 
 import * as twilio from "twilio";
-export function prepareParams(req: Request): Record<string, any> {
+export function prepareParams(body: {
+  [key: string]: [];
+}): Record<string, any> {
   const params: Record<string, any> = {};
 
   // Loop through body parameters
-  for (let key in req.body) {
-    params[key] = req.body[key];
+  for (let key in body) {
+    params[key] = body[key];
   }
   return params;
 }
