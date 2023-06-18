@@ -1,7 +1,6 @@
+import { ParsedUrlQuery } from "node:querystring";
 import * as twilio from "twilio";
-export function prepareParams(body: {
-  [key: string]: [];
-}): Record<string, any> {
+export function prepareParams(body: ParsedUrlQuery): Record<string, any> {
   const params: Record<string, any> = {};
 
   // Loop through body parameters
