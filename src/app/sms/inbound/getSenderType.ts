@@ -39,12 +39,17 @@ export async function getSenderType(From: string) {
       if (customers.data.length > 0) {
         senderType = "customer";
       } else {
+        //Currently all unknonwn numbers are potential Leads,
+        //How best to filter spam?
+        //ALso at some point incorporate logic to convert leads to Customers
+        //Perhaps when new custonmer added to stripe search for number in leads and remove
+        //Add a ui or text prompt to convert lead to customer
+        //chron job to sccrub leads that are converted to customer/ scammers
         const potentialLead = await db
-          .collection("potentialLeads")
-          .findOne({ phoneNumber: From });
-        if (potentialLead) {
-          senderType = "potentialLead";
-        }
+          .collection("Leads")
+          .insertOne({ phoneNumber: From });
+
+        senderType = "potentialLead";
       }
     }
 
