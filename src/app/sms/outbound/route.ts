@@ -1,20 +1,54 @@
 import { connectToDatabase } from "@/lib/mongo";
-import { NextApiRequest, NextApiResponse } from "next";
+import { ROOT_URL } from "@/lib/util";
+import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { parse } from "postcss";
 
 import twilio from "twilio";
+import request from "twilio/lib/http/request";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function POST(request: NextRequest) {
   try {
-    if (req.method !== "POST") {
-      return res.status(405).json({ message: "Method Not Allowed" });
+    const res = NextResponse;
+
+    if (typeof request.body == null) {
+      return false;
     }
 
+    const input = await request.body!.getReader().read();
+    const decoder = new TextDecoder();
+    const string = decoder.decode(input.value);
+    const body = parse(string) as unknown as SMS;
     // Replace these with actual validation and fetching from session or token
-    const ownerId = "ownerIdentifier";
-    const message = req.body.message;
+    const ownerId = process.env.MAINPHONE;
+    const message = body.Body;
+
+    console.log("HUH", body);
+    //const data = request.body;
+    console.log("data", body.Body);
+
+    const headersList = headers();
+    const twilioSignature = headersList.get("x-twilio-signature") as string;
+
+    const Fullurl =
+      process.env.VERCEL_ENV == "development"
+        ? process.env.TEST_URL
+        : `${ROOT_URL}${request.url}`;
+
+    if (!Fullurl || typeof twilioSignature != "string") {
+      return res.json({ status: 403 });
+    }
+
+    if (
+      //@ts-ignore
+      !checkSignature(authToken, Fullurl, prepareParams(body), twilioSignature)
+    ) {
+      return res.json({ error: "Invalid request signature" }, { status: 403 });
+    }
+
+    if (typeof body.From != "string" || typeof body.Body !== "string") {
+      return res.json({ error: "Invalid request " }, { status: 400 });
+    }
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({ message: "Invalid message" });
