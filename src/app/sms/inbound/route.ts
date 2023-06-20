@@ -3,8 +3,6 @@ import { ROOT_URL } from "@/lib/util";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { parse } from "node:querystring";
-import { getSenderType } from "./getSenderType";
-import { Body } from "twilio/lib/twiml/MessagingResponse";
 import { handleIncomming } from "./handleIncoming";
 const accountSid = process.env.TWILIO_ACCOUNT_SID as string;
 const authToken = process.env.TWILIO_AUTH as string;
