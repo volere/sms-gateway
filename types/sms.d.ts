@@ -19,3 +19,8 @@ interface SMS {
   From: string;
   ApiVersion: string;
 }
+
+type OutgoingMessage = {
+  phoneNumber: string;
+  message: string;
+} | null;
