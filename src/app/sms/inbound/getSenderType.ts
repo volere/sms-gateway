@@ -16,15 +16,15 @@ export async function getSenderType(From: string) {
     const EmployeeLookup = await db
       .collection("employees")
       .findOne({ phone: From });
-    console.log("emp:$$$", EmployeeLookup);
+    console.log("emp:", EmployeeLookup);
     if (EmployeeLookup) {
       if (From === EmployeeLookup.phone) {
         switch (EmployeeLookup.role) {
           case "admin":
-            senderType = "owner";
+            senderType = "admin";
             break;
-          case "double":
-            senderType = "double";
+          case "supervisor":
+            senderType = "supervisor";
             break;
           default:
             senderType = "generalEmployee";
@@ -45,9 +45,6 @@ export async function getSenderType(From: string) {
         //Perhaps when new custonmer added to stripe search for number in leads and remove
         //Add a ui or text prompt to convert lead to customer
         //chron job to sccrub leads that are converted to customer/ scammers
-        const potentialLead = await db
-          .collection("Leads")
-          .insertOne({ phoneNumber: From });
 
         senderType = "potentialLead";
       }

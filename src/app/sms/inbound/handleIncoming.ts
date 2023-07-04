@@ -4,8 +4,6 @@ import {
   handleGeneralEmployee,
   handleCurrentCustomer,
   handlePotentialLead,
-  handleSpam,
-  handleUnknown,
 } from "@/lib/twilio/messagehandler";
 import { Body } from "twilio/lib/twiml/MessagingResponse";
 import { getSenderType } from "./getSenderType";
@@ -15,17 +13,15 @@ export async function handleIncomming(Body: string, From: string) {
   console.log(senderType);
   const handlers: { [key: string]: (body: string, from: string) => void } = {
     owner: handleOwnerMessage,
-    double: handleDoubleEmployee,
+    supervisor: handleSupervisor,
     generalEmployee: handleGeneralEmployee,
     currentCustomer: handleCurrentCustomer,
     potentialLead: handlePotentialLead,
-    spam: handleSpam,
-    unknown: handleUnknown,
   };
 
   if (handlers[senderType]) {
     await handlers[senderType](Body, From);
   } else {
-    await handleUnknown(From);
+    throw Error;
   }
 }
